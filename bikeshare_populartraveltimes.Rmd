@@ -1,0 +1,162 @@
+---
+title: "Bikeshare_popular travel times"
+output:
+  html_document:
+    code_folding: hide
+---
+
+This project was completed as a part of the udacity data science with R nano degree program. The project goal was to formulate and answer some questions using the bikeshare data from three US cities.
+```{r setup, echo = FALSE}
+
+library(data.table)
+library(stringr)
+library(ggplot2)
+
+
+th1<- theme(
+              panel.background = element_rect(fill = "grey",
+                                colour = "grey",
+                                size = 0.5, linetype = "solid"),
+              panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                colour = "white"), 
+              panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                colour = "white"))
+# color palette vector for line plots
+c.palette <- c("darkblue", "darkgreen", "darkred")
+```
+
+# Question 1: Popular times of travel 
+What is the most common month ?
+What is the most common day of week?
+What is the most common hour of day?
+
+## Step a) Data Cleaning and organization - 
+In the first R code chunk, I used data.table library to read only the columns of interest, and to create a new column 'City' (fill it with values Chicago, Newyork and Washington respectively) for all three data sets. I then combined all of the data tables into one using rbind. Finally, I used the stringr replace all function for replacing the spaces in column names with a dot. This wrangling work resulted in creating one table for creating all of the summaries and visualizations needed to answer this question. 
+
+```{r,, echo = TRUE}
+ch <- fread("Data/chicago.csv", select = c(2,3,4))         # read csv as data table
+ch[,"City":="Chicago"]
+
+ny <- fread('Data/new-york-city.csv', select = c(2,3,4))
+ny[,"City":= "Newyork"]
+
+wa <- fread('Data/washington.csv', select = c(2,3,4))
+wa[,"City":= "Washington"]
+
+dt <- rbind(ch,ny,wa)                                 #combine data tables
+names(dt) <- str_replace_all(names(dt), c(" "="."))   #replace empty space in column name with a .
+strt <- as.POSIXct(dt$Start.Time)                     #POSIX for timestamps as calendar times
+dt[, "start.month" := strftime(strt, "%b")]           #extracting month from timestamp and storing in a new column start.month
+dt[, "start.DOW" := strftime(strt, "%a")]             #extracting day of week from timestamp and storing in a new column start.DOW
+dt[, "start.hourofday" := strftime(strt, "%H")]       #extracting hour of day from timestamp and storing in a new column start.hourofday
+
+```
+
+## Step b) Functions for creating summaries
+i) Get.Most.Common --> returns the most common (i.e. the highest count) metric combined for the three cities (overall) as well as broken down per city (grouped)
+
+```{r, echo = TRUE}
+Get.Most.Common <- function(metric, grp.by){
+      usr_input1<- metric
+      usr_input2<- grp.by
+      txt_usr_input1<- deparse((substitute(metric)))    # only retaining the text of the argument
+      txt_usr_input2<-deparse((substitute(grp.by)))    # only retaining the text of the argument
+      temp.overall<- dt[, .N, by=.(metric)]             #create list of count by metric (i.e. month, DOW or hour) for the entrie table
+      overall <- temp.overall[, .SD[which.max(N)]]      # find the highest count i.e. the most common
+      setnames(overall, "metric",sub('...','',txt_usr_input1))        #output table headers to reflect input text
+      setnames(overall, "N", "Overall_ Count")
+      temp.bygrp <- dt[, .N, by=.(grp.by, metric)]      # create count grouped by city and the metric
+      bygrp <-temp.bygrp[, .SD[which.max(N)], by =grp.by]   #find max
+      setnames(bygrp, "grp.by",sub('...','',txt_usr_input2))              #rename headers
+      setnames(bygrp, "metric",sub('...','',txt_usr_input1))
+      setnames(bygrp, "N", "Grouped_ Count")
+      
+      result <- list("Most Common Overall"=overall, "Most Common Grouped"= bygrp)   #combine outputs into a list since a function can only have       
+    
+     
+      return(result)
+     
+}
+
+Get.Most.Common(dt$start.month, dt$City)
+Get.Most.Common(dt$start.DOW, dt$City)
+Get.Most.Common(dt$start.hourofday,dt$City)
+```
+
+ii) Freq.Categorical - creates frequency tables for categorical variable input combined for the three cities (overall) as well as broken down per city (grouped). The frequency table supplements the data visualizations created using ggplot2, if viewers need to take a look at exact numbers for a certain metric.
+
+```{r, echo = TRUE, out.width="100%"}
+
+#function to calculate frequency tables and plots by metric 
+#1-deparse will get text out of user input - for creating dynamic plot labels
+#2-Overall frequency followed by bygrp(by city) frequency table using data.table functions
+#3 - c.palette specifies color palette for the bygrp(by city) plots. 
+#4-  create a list of ggplot items that are common to all plots.
+#5 -Conditional (if else) to order by monthor by day - do this forboth overall and bygrp(by city)plots.
+freq.categorical <- function(metric, grp.by){  
+      
+      txt_usr_input1<- sub('...','',deparse((substitute(metric)))) #1
+      txt_usr_input2<- sub('...','',deparse((substitute(grp.by))))
+      temp.overall<- dt[, .N, by=.(metric)]#summarizing data
+      overall <- temp.overall[order(-N)]                #2
+      temp.bygrp <- dt[, .N, by=.(grp.by, metric)]
+      bygrp <- temp.bygrp[order(dt, -N)] #2
+      c.palette <- c("darkblue", "darkgreen", "darkred")
+      #4 (for overall)
+      p<- list(
+          geom_bar(stat = "identity", fill = "darkblue"), 
+          ggtitle(paste0('Histogram for ', txt_usr_input1)),
+          scale_y_continuous(labels = function(x) format(x, scientific = FALSE)),
+          th1,labs(x = paste0(txt_usr_input1), y = 'Count')
+      )
+      #4 (for bygrp)
+      p2 <- list(geom_line(size = 1) ,
+                scale_y_continuous(labels = function(x) format(x, scientific = FALSE)),
+                geom_point( size=4, shape=21,fill="white"),
+                scale_color_manual(values = c.palette), th1,
+                ggtitle(paste0('Trend chart for ', txt_usr_input1, ' by ', txt_usr_input2)),
+                labs(x = paste0(txt_usr_input1), y = 'Count')
+        )
+      # 5 conditional
+      #if DOW (string) in the argument, then factor the metric column with levels as ordered days of week with Sunday being first day
+      if(str_detect(txt_usr_input1, "DOW")) {  
+          overall$metric <- factor(overall$metric, 
+                                  levels =c("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"))
+          overall<- overall[order(overall$metric)]
+          bygrp$metric <- factor(bygrp$metric, 
+                                  levels =c("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"))
+          bygrp<- bygrp[order(bygrp$metric)]
+          pltx <- ggplot(data=overall, aes_string(x=names(overall)[1], y = names(overall)[2])) + p  
+          plt2x<-ggplot(data=bygrp, aes_string(x=names(bygrp)[2], y=names(bygrp)[3], group = names(bygrp)[1], colour = names(bygrp)[1])) +p2
+      print(pltx)
+      print(plt2x)
+      #elseif month(string) in the argument, then use the month.abb function to order month JAn - DEc
+      }else if(str_detect(txt_usr_input1, "month")){
+          pltx <-ggplot(data=overall, aes_string(x=names(overall)[1], y = names(overall)[2])) +
+                 scale_x_discrete(limits = month.abb) + p
+          plt2x<-ggplot(data=bygrp, aes_string(x=names(bygrp)[2], y=names(bygrp)[3], group = names(bygrp)[1], colour = names(bygrp)[1])) +
+                 scale_x_discrete(limits = month.abb) + p2
+      print(pltx)
+      print(plt2x)
+      # else plot and print
+      }else{
+          pltx <- ggplot(data=overall, aes_string(x=names(overall)[1], y = names(overall)[2])) + p
+          plt2x<-ggplot(data=bygrp, aes_string(x=names(bygrp)[2], y=names(bygrp)[3], group = names(bygrp)[1], colour = names(bygrp)[1])) +p2
+      print(pltx)
+      print(plt2x)
+      }
+    
+      result <- list("Overall"=overall, "Grouped"= bygrp) #combining summary result
+      
+return(result)
+     
+}
+
+freq.categorical(dt$start.month, dt$City)
+freq.categorical(dt$start.DOW, dt$City)
+freq.categorical(dt$start.hourofday, dt$City)
+```
+## Step c) Results summary
+June is the most common rental month overall, as well as for each of the cities. This may be driven by warm summer temperatures, tourists visitings due to school holidays etc.
+Wednesday is the most common day for start of the rentals overall. When broken down by the city, we see that wednesday is still the most comon rental start day for New York and washington, but for Chicgo the most common day of retnal start is Tuesday. weekday rentals may be higher due to workers commuting to work.
+Hourly data shows a bimodal distribution overall with 08:00am and 5:00pm being the most popular times for travel. This, again is likely due to the workers commuting to and from work at these hours. Trend by city shows the same dual peaks. The 5:00pm peak for washington is small, which may be due to overnight rentals. 

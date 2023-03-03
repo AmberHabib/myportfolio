@@ -1,7 +1,7 @@
-name: "personal-website"
+name: "Amber-Ahmed"
 output_dir: "."
 navbar:
-  title: "Personal Website"
+  title: "Amber Ahmed"
   left:
     - text: "Home"
       href: index.html
@@ -10,15 +10,19 @@ navbar:
     - text: "Projects" 
       menu: 
         - text: "Class Projects"
-        - text: "P1"
+        - text: "Oregon Wildfires"
           href: oregon_wildfires.html
         - text: "---------"
         - text: "Personal Projects"
-        - text: "P2" 
-          href: a.html
+        - text: "Fibonacci Spirals" 
+          href: fibonacci_spirals.html  
+        - text: "Bikeshare popular times of travel"  
+          href: bikeshare_populartraveltimes.html  
+        - text: "Bikeshare trip durations"   
+          href: bikeshare_tripduration.html   
 output:
   html_document:
-    theme: cosmo
+    theme: cosmo  
     includes:   
        after_body: footer.html
     
