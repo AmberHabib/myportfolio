@@ -6,18 +6,20 @@ navbar:
     - text: "Home"
       href: index.html
     - text: "About Me"
-      href: a.html 
+      href: about.html 
     - text: "Projects" 
       menu: 
         - text: "Class Projects"
         - text: "P1"
-          href: a.html
+          href: oregon_wildfires.html
         - text: "---------"
         - text: "Personal Projects"
         - text: "P2" 
           href: a.html
 output:
   html_document:
-    theme: flatly
+    theme: cosmo
+    includes:   
+       after_body: footer.html
     
       
