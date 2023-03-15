@@ -67,7 +67,7 @@ pv<- ggplot(data=df, aes(x=x,y=y, color = factor(color_code)))+
   #enter_fade()+
   #exit_fade()
   
-animate(pv, fps = 2,height = 430, width = 430)
+gganimate::animate(pv, fps = 2,height = 430, width = 430)
 
 ```
 

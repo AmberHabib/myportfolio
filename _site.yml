@@ -15,11 +15,17 @@ navbar:
         - text: "---------"
         - text: "Personal Projects"
         - text: "Fibonacci Spirals" 
-          href: fibonacci_spirals.html  
+          href: fibonacci_spirals.html   
         - text: "Bikeshare popular times of travel"  
           href: bikeshare_populartraveltimes.html  
         - text: "Bikeshare trip durations"   
           href: bikeshare_tripduration.html   
+        - text: "---------"    
+        - text: "Publications"    
+        - text: "The Balancing Act"         
+          href: https://medium.com/mlearning-ai/the-central-limit-theorem-faaba8261a0f    
+        - text: "Biological Pathway for Schizophernia"    
+          href: https://pubmed.ncbi.nlm.nih.gov/26474411/        
 output:
   html_document:
     theme: cosmo  
