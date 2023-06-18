@@ -1,0 +1,35 @@
+---
+title: "Geospatial Timeseries Animation"
+date: '2023-06-16'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+**Data Source:** [The Database of Religious History](https://religiondatabase.org/)
+
+
+
+**Languages:** *Python*
+
+
+
+**Libraries:** 
+
+
+* Webscraping:  *selenium*
+* Data Cleaning: *pandas, geopandas, google geocoding api, countryconverter*
+* Visualization: *pandas, numpy and plotly*
+
+
+**Code and Notebooks:** [Github link](https://github.com/AmberHabib/religious_history_project)
+
+
+I created this animation to understand the formation and spread of new religious groups over time across the globe. It took a lot of time to make this plot, from scraping the data from [the source](https://religiondatabase.org/browse/regions) to creating an interactive visualization with the aim of accomodating as much information as possible in a single animation. 
+
+[Click here]('religious_history_EDA.html') to see more EDA plots for this data. 
+
+```{r, echo = FALSE, out.width="100%", out.height="100%"}
+knitr::include_url("religious_history_project/religion_anim_slider_scattermaps_final.html", height="600")
+```

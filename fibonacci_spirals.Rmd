@@ -58,3 +58,6 @@ p
 
 I generated the animation [here](index.html) using gganimate() package. I experimented with values of $\phi$ other than golden ratio in the graphic. 
 
+```{r,out.width="100%"}
+knitr::include_url("religion_by_continent.html")
+```
