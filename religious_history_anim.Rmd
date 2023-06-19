@@ -26,10 +26,10 @@ knitr::opts_chunk$set(echo = FALSE)
 **Code and Notebooks:** [Github link](https://github.com/AmberHabib/religious_history_project)
 
 
-I created this animation to understand the formation and spread of new religious groups over time across the globe. It took a lot of time to make this plot, from scraping the data from [the source](https://religiondatabase.org/browse/regions) to creating an interactive visualization with the aim of accomodating as much information as possible in a single animation. 
+I created this animation to understand the formation and spread of new religious groups over time across the globe. I took a lot of care in making this plot, from scraping the data from [the source](https://religiondatabase.org/browse/regions) to creating an interactive visualization with the aim of accomodating as much information as possible in a single animation. I tried my best to reference and map  the regions with ancient names  accurately. Please contact me via email if you find errors.
 
-[Click here]('religious_history_EDA.html') to see more EDA plots for this data. 
+[Click here](religious_history_EDA.html) to see more EDA plots for this data. 
 
-```{r, echo = FALSE, out.width="100%", out.height="100%"}
+```{r, echo = FALSE, out.width="100%"}
 knitr::include_url("religious_history_project/religion_anim_slider_scattermaps_final.html", height="600")
 ```

@@ -67,7 +67,7 @@ Finally, a trend line showing the global counts of religious groups as a functio
 
 ![](religious_history_project/religion_trendline.png){width=50% height=50%}
 
-[Click here]('religious_history_anim.html') to see the geospatial time series visualizations of this data. 
+[Click here](religious_history_anim.html) to see the geospatial time series visualizations of this data. 
 
 
 
