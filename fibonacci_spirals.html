@@ -312,22 +312,14 @@ $(document).ready(function () {
 </div>
 
 
-<p>I have always found a sense of peace through painting and drawing
-geometric patterns. After all, geometry is the language of nature. I
-draw my inspiration from the ancient and medieval geometric art to
-recreate the patterns using a ruler and compass on a tracing paper, then
-transfer to the painting paper(watercolor). This time though, I wanted
-to do this using a computer program. This project is one example pattern
-created using the Fibonacci spirals.</p>
-<p>Before writing this post, I wasn’t familiar with the term Fibonacci
-spirals. I was only looking to find a way to draw some of my geometric
-patterns in R. I stumbled upon a picture of the center of a sunflower,
-showing the beautiful arrangement of the seeds in the middle. And I
-wondered, if I could create that pattern…</p>
+<p>The image below shows the arrangement of seeds in the middle of a
+sunflower. The seeds are arranged in a pattern - generally knows as
+phyllotaxis. In nature, many plants show this arrangement of leaves and
+seeds.</p>
 <p><a
 href="https://blog.wolfram.com/2011/07/28/how-i-made-wine-glasses-from-sunflowers/">This</a>
-post helped towards understanding the mathematics behind the
-arrangement. Three things noted in the arrangement are:</p>
+post helped in understanding the mathematics behind the arrangement.
+Three things noted in the arrangement are:</p>
 <ul>
 <li><p>The seeds spiral outward, with each seed positioned at a fixed
 angle relative to its predecessor.</p></li>
@@ -366,13 +358,16 @@ p &lt;- ggplot(data = df, aes(x=x,y=y))+
 
 p</code></pre>
 <p><img src="fibonacci_spirals_files/figure-html/unnamed-chunk-1-1.png" width="576" style="display: block; margin: auto;" /></p>
-<p>I generated the animation <a href="index.html">here</a> using
-gganimate() package. I experimented with values of <span
-class="math inline">\(\phi\)</span> other than golden ratio in the
-graphic.</p>
-<pre class="r"><code>knitr::include_url(&quot;religion_by_continent.html&quot;)</code></pre>
-<iframe src="religion_by_continent.html" width="100%" height="400px" data-external="1">
-</iframe>
+<p>I generated the animation below and <a href="index.html">here</a>
+using gganimate() package. I experimented with values of <span
+class="math inline">\(\phi\)</span> other than golden ratio in both
+graphics. The beautiful flower patterns in the animation <a
+href="index.html">here</a> appear because of tweening (interpolation of
+data points while transitioning from one state to the next). gganimate
+uses tweenr (another R package) for interpolating the data during
+transitions between states. More geometric art R scripts on <a
+href="https://github.com/AmberHabib/geometric_art">github</a></p>
+<p><img src="fibonacci_spirals_files/figure-html/unnamed-chunk-2-1.gif" style="display: block; margin: auto;" /></p>
 
 
 <!-- Add icon library -->

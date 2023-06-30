@@ -9,11 +9,11 @@ output:
 library(ggplot2)
 library(gganimate)
 ```
-I have always found a sense of peace through painting and drawing geometric patterns. After all, geometry is the language of nature. I draw my inspiration from the ancient and medieval geometric art to recreate the patterns using a ruler and compass on a tracing paper, then transfer to the painting paper(watercolor). This time though, I wanted to do this using a computer program. This project is one example pattern created using the Fibonacci spirals. 
 
-Before writing this post, I wasn't familiar with the term Fibonacci spirals. I was only looking to find a way to draw some of my geometric patterns in R. I stumbled upon a picture of the center of a sunflower, showing the beautiful arrangement of the seeds in the middle. And I wondered, if I could create that pattern...
 
-[This](https://blog.wolfram.com/2011/07/28/how-i-made-wine-glasses-from-sunflowers/) post helped towards understanding the mathematics behind the arrangement. Three things noted in the arrangement are:
+The image below shows the arrangement of seeds in the middle of a sunflower. The seeds are arranged in a pattern - generally knows as phyllotaxis. In nature, many plants show this arrangement of leaves and seeds.
+
+[This](https://blog.wolfram.com/2011/07/28/how-i-made-wine-glasses-from-sunflowers/) post helped in  understanding the mathematics behind the arrangement. Three things noted in the arrangement are:
 
 
 * The seeds spiral outward, with each seed positioned at a fixed angle relative to its predecessor.
@@ -56,8 +56,62 @@ p <- ggplot(data = df, aes(x=x,y=y))+
 p
 ```
 
-I generated the animation [here](index.html) using gganimate() package. I experimented with values of $\phi$ other than golden ratio in the graphic. 
+I generated the animation below and [here](index.html) using gganimate() package. I experimented with values of $\phi$ other than golden ratio in both graphics. The beautiful flower patterns in the animation [here](index.html) appear because of tweening (interpolation of data points while transitioning from one state to the next). gganimate uses tweenr (another R package) for interpolating the data during transitions between states. 
+More geometric art R scripts on [github](https://github.com/AmberHabib/geometric_art)
 
-```{r,out.width="100%"}
-knitr::include_url("religion_by_continent.html")
+```{r, echo=FALSE,warning=FALSE, message = FALSE, fig.height=6, fig.width=6, fig.align='center'}
+df <- data.frame(matrix(ncol = 4, nrow = 0))
+colnames(df) <- c('x', 'y', 'id','color_code')
+
+ratios <- c(seq(0.6165,0.6180,0.0001))
+
+gamma_n <- 0
+for(j in 1:length(ratios)){
+  gamma_n <- 2*pi*ratios[j]
+  #print(gamma_n)
+  id <- c() #shape id
+  x<- c()   #x-loc
+  y <- c() #y-loc
+  ccode <-c()
+  df_temp <- data.frame(matrix(ncol = 4, nrow = 0))
+  colnames(df_temp) <- c('x', 'y', 'id','color_code') 
+  
+  for (i in 1:1000){
+    x<- c(x,sqrt(i)*cos(i*gamma_n))
+    y<- c(y,sqrt(i)*sin(i*gamma_n))
+    id <- c(id,j)
+    
+  }
+  ccode<- c(rep(1,100),rep(2,100),rep(3,100),
+            rep(4,100),rep(5,100),rep(6,100),
+            rep(7,100),rep(8,100),rep(9,100),
+            rep(10,100))
+  df_temp <- data.frame(x = x, y = y, id = id, color_code = ccode)
+  df<- rbind(df,df_temp)
+  
+}
+
+
+
+library(gganimate)
+pv<- ggplot(data=df, aes(x=x,y=y, color = factor(color_code)))+
+  geom_point(size=1.5,aes(group=color_code))+
+  theme(legend.position = "none",
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        plot.background = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.background = element_rect(fill='transparent'),
+        axis.title.x=element_blank(),
+        axis.title.y=element_blank())+
+  transition_states(id,transition_length = 3, state_length = 1, wrap = FALSE)
+  #ease_aes('linear')+
+  #enter_fade()+
+  #exit_fade()
+  
+gganimate::animate(pv, fps = 2,height = 430, width = 430)
+
 ```
