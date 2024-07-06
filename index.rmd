@@ -19,5 +19,6 @@ knitr::include_graphics('flowers2.gif')
 
 (*Carl Friedrich Gauss*)
 
-
-[click here](fibonacci_spirals.html) to see how I made a similar animation.
+```{r, include = FALSE}
+#[click here](fibonacci_spirals.html) to see how I made a similar animation.
+```

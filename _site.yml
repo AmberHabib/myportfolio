@@ -12,8 +12,10 @@ navbar:
         - text: "Data Science"
         - text: "Oregon Wildfires"
           href: oregon_wildfires.html
-        - text: "Unsupervised learning - K-means Clustering"
-          href: clustering_usda_meat_data.html
+        - text: "Optimizing Graph Traversal: Shortest Path Analysis on Wikipedia"
+          href: wikiracer.html
+        - text: "Unsupervised learning: K-means Clustering"
+          href: kmeans.html
         - text: "---------"
         - text: "Data Analysis"
         - text: "Fibonacci Spirals" 

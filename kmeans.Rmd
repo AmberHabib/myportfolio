@@ -1,0 +1,13 @@
+---
+title: "Unsupervised learning: K-means Clustering"
+output:
+  html_document:
+    code_folding: hide
+---
+
+```{r setup, echo = FALSE, warning=FALSE,message = FALSE}
+knitr::opts_chunk$set(echo = TRUE,warning = FALSE, message = FALSE)
+library(htmltools)
+html <- includeHTML("clustering_usda_meat_data.html")
+html
+```

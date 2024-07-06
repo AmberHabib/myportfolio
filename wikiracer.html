@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Optimizing Graph Traversal: Shortest Path Analysis on Wikipedia</title>
+
+<script src="site_libs/header-attrs-2.25/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Amber Ahmed</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About Me</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Projects
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li class="dropdown-header">Data Science</li>
+    <li>
+      <a href="oregon_wildfires.html">Oregon Wildfires</a>
+    </li>
+    <li>
+      <a href="wikiracer.html">Optimizing Graph Traversal: Shortest Path Analysis on Wikipedia</a>
+    </li>
+    <li>
+      <a href="kmeans.html">Unsupervised learning: K-means Clustering</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Data Analysis</li>
+    <li>
+      <a href="fibonacci_spirals.html">Fibonacci Spirals</a>
+    </li>
+    <li>
+      <a href="religious_history_EDA.html">Religious groups over time - EDA</a>
+    </li>
+    <li>
+      <a href="religious_history_anim.html">Geospatial Timeseries</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Publications</li>
+    <li>
+      <a href="https://medium.com/mlearning-ai/the-central-limit-theorem-faaba8261a0f">The Balancing Act</a>
+    </li>
+    <li>
+      <a href="https://pubmed.ncbi.nlm.nih.gov/26474411/">Biological Pathway for Schizophernia</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Optimizing Graph Traversal: Shortest Path
+Analysis on Wikipedia</h1>
+
+</div>
+
+
+<div id="project-overview" class="section level3">
+<h3>Project Overview</h3>
+<p>I completed this project for my masters DS and Algorithms course.
+Wikipedia is a massive graph of interconnected links (nodes). The
+objective of this assignment was to write the logic for traversing from
+given wikipedia (source) link to another given (goal) link. One of the
+key objectives was to implement a shortest path routine, minimizing the
+number of downloads in going from source to goal by combining ideas from
+breadth first search (BFS), depth first search (DFS) and Dijkstra’s
+algorithm.</p>
+</div>
+<div id="information" class="section level3">
+<h3>Information</h3>
+<p>The graphs shown below are drawn using an example search, with
+<strong>source_node(pink)</strong> = Star_wars,
+<strong>goal_node(green)</strong> = Computer</p>
+<p><strong>BFS implementation</strong> - wikipedia is assumed to be a
+massive undirected, unweighted graph. The search spreads out evenly
+across all the links from the source - as shown in the image below -
+then next level and so on, skipping the nodes already visited, until the
+goal is found or the search options are exhausted. I created the picture
+below for visually understanding BFS <img
+src="https://user-images.githubusercontent.com/27968723/172977797-a864f8e4-dca3-4e9a-b14e-6cc18ae2ff26.png"
+alt="BFS" /> <strong>DFS implementation</strong> - Starting at the
+source, all the valid links in the source are collected and source node
+is marked as visited. The last (most recent) link collected from the
+source becomes the new source node and same procedure is repeated, until
+the goal is found or the search options are exhausted. The Image below
+shows DFS search path for our example case <img
+src="https://user-images.githubusercontent.com/27968723/172977849-a8ca7da9-991a-4251-92ad-120bd1b2b41e.png"
+alt="DFS" /> <strong>Wikiracer implementation</strong> - Dijkstras
+algorithm is an algorithm for finding the shortest path between two
+nodes. All edges have a weight associated with them, with lower weights
+having a lower cost, therefore a higher priority in the queue. For this
+implementation a modifed Disjkstra’s algoithm is used, edge weights are
+assigned based on following criteria: - a shallow bfs is performed on
+the links in the goal node, and these are then compared to the link in
+the source, having more links in common results in a lower cost - common
+substring between a link and the goal link, the longer the length of the
+common substring the lower the cost - the most common links in the
+wikipedia graph are ignored, this prevents the algorithm from running
+through the generic links over and over <img
+src="https://user-images.githubusercontent.com/27968723/172977874-12f53641-64f1-4ddc-a733-4499fd31956e.png"
+alt="Racer" /> ### Result A key performance criterion for the racer was
+to perform the search by minimizing the number of downloads from the
+internet - because ultimately wikiracing is about speed and jumping from
+page to page is the most time consuming aspect of the game. The
+comparison table between the three implementations clearly shows the
+modified Dijkstra’s implementation as a winner for this specification.
+<img
+src="https://user-images.githubusercontent.com/27968723/172978444-d5dc0b5c-59ba-48e1-9c70-6dc0040103c6.png"
+alt="statistics" /></p>
+</div>
+<div id="improvements" class="section level3">
+<h3>Improvements</h3>
+<p>I have realized that there are tradeoffs to implementing a more
+complex cost function for the racer. While a complex function may work
+well for one search, it may have poor performance in another. For this
+generic wikipedia search problem, I settled for a function that gave
+okay perfromance for most of my searches. In real life though, while
+working on a specific search, this implementation will need to be
+tweaked to optimize for that particular case.</p>
+</div>
+
+
+<!-- Add icon library -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<!-- Add font awesome icons -->
+<p style="text-align: center;">
+    <a href="https://www.linkedin.com/in/amberahmed/" class="fa fa-linkedin"></a>
+    <a href="https://github.com/AmberHabib?tab=repositories" class="fa fa-github"></a>
+</p>
+<p style="text-align: center;"><span style="color: #000000;"><em>amber.m.ahmed@utexas.edu</em></span></p>
+<p style="text-align: center;">Copyright &copy; <script>new Date().getFullYear()>2010&&document.write(+new Date().getFullYear());</script>, Amber Ahmed. All rights reserved.
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

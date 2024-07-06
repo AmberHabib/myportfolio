@@ -1,0 +1,48 @@
+---
+title: "Optimizing Graph Traversal: Shortest Path Analysis on Wikipedia"
+output:
+  html_document:
+    code_folding: hide
+---
+
+```{r setup, echo = FALSE, warning=FALSE,message = FALSE}
+knitr::opts_chunk$set(echo = TRUE,warning = FALSE, message = FALSE)
+library(ggplot2)
+
+```
+
+### Project Overview
+I completed this project for my masters DS and Algorithms course. Wikipedia is a massive graph of interconnected links (nodes). 
+The objective of this assignment was to write the logic for traversing from given wikipedia (source) link
+to another given (goal) link. One of the key objectives was to implement a shortest path routine, minimizing the number of downloads in going from source to goal by combining 
+ideas from breadth first search (BFS), depth first search (DFS) and Dijkstra's algorithm. 
+
+### Information
+The graphs shown below are drawn using an example search, with **source_node(pink)** = Star_wars, **goal_node(green)** = Computer
+
+**BFS implementation** -  wikipedia is assumed to be a massive undirected, unweighted graph. The search spreads out evenly across all the links from the source - as 
+shown in the image below - then next
+level and so on, skipping the nodes already visited, until the goal is found or the search options are exhausted. I created the picture below for visually understanding BFS
+![BFS](https://user-images.githubusercontent.com/27968723/172977797-a864f8e4-dca3-4e9a-b14e-6cc18ae2ff26.png)
+**DFS implementation** - Starting at the source, all the valid links in the source are collected and source node is marked as visited. The last   (most recent) 
+link collected from the source becomes the new source node and same procedure is repeated, until the goal is found or the search options are exhausted. The Image below shows
+DFS search path for our example case
+![DFS](https://user-images.githubusercontent.com/27968723/172977849-a8ca7da9-991a-4251-92ad-120bd1b2b41e.png)
+**Wikiracer implementation** - Dijkstras algorithm is an algorithm for finding the shortest path between two nodes. All edges have a weight associated with them, with lower 
+weights having a lower cost, therefore a higher priority in the queue. For this implementation a modifed Disjkstra's algoithm is used, edge weights are
+assigned based on following criteria:
+  - a shallow bfs is performed on the links in the goal node, and these are then compared to the link in the source, having more links in common results in a lower cost
+  - common substring between a link and the goal link, the longer the length of the common substring the lower the cost
+  - the most common links in the wikipedia graph are ignored, this prevents the algorithm from running through the generic links over and over
+![Racer](https://user-images.githubusercontent.com/27968723/172977874-12f53641-64f1-4ddc-a733-4499fd31956e.png)
+### Result
+A key performance criterion for the racer was to perform the search by minimizing the number of downloads from the internet - because ultimately wikiracing is about speed
+and jumping from page to page is the most time consuming aspect of the game. The comparison table between
+the three implementations clearly shows the modified Dijkstra's implementation as a winner for this specification. 
+![statistics](https://user-images.githubusercontent.com/27968723/172978444-d5dc0b5c-59ba-48e1-9c70-6dc0040103c6.png)
+
+### Improvements
+I have realized that there are tradeoffs to implementing a more complex cost function for the racer. While a complex function may work well for one search, it may have
+poor performance in another. For this generic wikipedia search problem, I settled for a function that gave okay perfromance for most of my searches. In real life though,
+while working on a specific search, this implementation will need to be tweaked to optimize for that particular case.
+
