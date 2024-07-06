@@ -12,6 +12,8 @@ navbar:
         - text: "Data Science"
         - text: "Oregon Wildfires"
           href: oregon_wildfires.html
+        - text: "Unsupervised learning - K-means Clustering"
+          href: clustering_usda_meat_data.html
         - text: "---------"
         - text: "Data Analysis"
         - text: "Fibonacci Spirals" 
@@ -20,8 +22,6 @@ navbar:
           href: religious_history_EDA.html  
         - text: "Geospatial Timeseries"   
           href: religious_history_anim.html   
-        - text: "Bikeshare popular times of travel"  
-          href: bikeshare_populartraveltimes.html        
         - text: "---------"    
         - text: "Publications"    
         - text: "The Balancing Act"         
